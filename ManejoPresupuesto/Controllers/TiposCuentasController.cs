@@ -15,7 +15,7 @@ namespace ManejoPresupuesto.Controllers
         }
         public IActionResult Crear()
         {
-            return View();  
+            return View();
         }
 
         [HttpPost]
@@ -25,9 +25,34 @@ namespace ManejoPresupuesto.Controllers
             {
                 return View(tipoCuenta);
             }
+
             tipoCuenta.UsuarioId = 1;
+            var existeTipoCuenta = await repositorioTiposCuentas.Existe(tipoCuenta.Nombre, tipoCuenta.UsuarioId);
+
+            if (existeTipoCuenta)
+            {
+                ModelState.AddModelError(nameof(tipoCuenta.Nombre), $"El nombre '{tipoCuenta.Nombre}' ya existe.");
+                return View(tipoCuenta);
+            }
+
             await repositorioTiposCuentas.Crear(tipoCuenta);
+
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VerificarTipoCuentaExiste(string nombre)
+        {
+            var usuarioId = 1;
+            var existeTipoCuenta = await repositorioTiposCuentas.Existe(nombre, usuarioId);
+
+            if (existeTipoCuenta)
+            {
+                return Json($"el nombre '{nombre}' ya existe.");
+            }
+
+            return Json(true);
+
         }
     }
 }

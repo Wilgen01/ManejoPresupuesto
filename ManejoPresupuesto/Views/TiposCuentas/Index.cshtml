@@ -9,9 +9,15 @@
     Ejemplo: Prestamos, Tarjetas de credito, etc.
 </h5>
 
-<a asp-action="Crear" class="btn btn-primary mb-3">Crear nuevo</a>
+<a asp-action="Crear" class="btn btn-primary mb-5">Crear nuevo</a>
 
-
+@if(!Model.Any())
+{
+    <hr />
+    <h1 class="text-center mt-5">Oops! no se encontraron resultados</h1>
+}
+else
+{
 <table class="table"> 
     <thead>
         <tr>
@@ -24,12 +30,13 @@
         {
             <tr>
                 <td>
-                    <a class="btn btn-primary">Editar</a>
-                    <a class="btn btn-danger">Borrar</a>
+                    <a class="btn btn-primary" asp-action="Editar" asp-route-id="@tipocuenta.Id">Editar</a>
+                    <a class="btn btn-danger" asp-action="Borrar" asp-route-id="@tipocuenta.Id">Borrar</a>
                 </td>
                 <td>@tipocuenta.Nombre</td>
             </tr>
             
         }
     </tbody>
-</table>
+</table> 
+}

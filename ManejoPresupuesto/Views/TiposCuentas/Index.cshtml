@@ -30,6 +30,7 @@ else
         {
             <tr>
                 <td>
+                    <input type="hidden" value="@tipocuenta.Id" class="ids"/>
                     <a class="btn btn-primary" asp-action="Editar" asp-route-id="@tipocuenta.Id">Editar</a>
                     <a class="btn btn-danger" asp-action="Borrar" asp-route-id="@tipocuenta.Id">Borrar</a>
                 </td>
@@ -43,8 +44,39 @@ else
 
 @section Scripts{
     <script>
+        const urlOrdenar = '@Url.Action("Ordenar")';
+
         $(function(){
-                    $("#reordenable").sortable();
+
+            $("#reordenable").sortable({
+                stop: async function(e, ui){
+                    await actualizarOrden();
+                }
+            });
+
+            async function actualizarOrden(){
+                const ids = obtnerIdsDeElementos();
+                await enviarIdsAlBackend(ids);
+            }
+
+            function obtnerIdsDeElementos(){
+                const ids = $(".ids").map(function(){
+                    return $(this).val();
+                }).get()
+
+                return ids;
+            }
+
+            async function enviarIdsAlBackend(ids){
+                var data = JSON.stringify(ids);
+                await fetch(urlOrdenar, {
+                    method: 'POST',
+                    body: data,
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                });
+            }
         })
     </script>
 }

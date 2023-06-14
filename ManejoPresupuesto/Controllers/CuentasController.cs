@@ -3,6 +3,7 @@ using ManejoPresupuesto.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace ManejoPresupuesto.Controllers
 {
@@ -20,6 +21,20 @@ namespace ManejoPresupuesto.Controllers
             this.servicioUsuarios = servicioUsuarios;
             this.repositorioCuentas = repositorioCuentas;
         }
+
+        public async Task<IActionResult> Index()
+        {
+            var usuarioId = servicioUsuarios.ObtenerUsuarioId();
+            var cuentasConTipoCuenta = await repositorioCuentas.Buscar(usuarioId);
+            var modelo = cuentasConTipoCuenta.GroupBy(x => x.TipoCuenta)
+                                             .Select(grupo => new IndiceCuentasViewmodel 
+                                             {
+                                                 TipoCuenta = grupo.Key,
+                                                 Cuentas = grupo.AsEnumerable(),
+                                             }).ToList();
+            return View(modelo);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Crear()
         {

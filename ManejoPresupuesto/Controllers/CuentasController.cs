@@ -89,6 +89,8 @@ namespace ManejoPresupuesto.Controllers
             return View(modelo);
         }
 
+
+
         private async Task<IEnumerable<SelectListItem>> ObtenerTiposCuentas(int usuarioId)
         {
             var tiposCuentas = await repositorioTiposCuentas.Obtener(usuarioId);

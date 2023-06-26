@@ -6,6 +6,8 @@ namespace ManejoPresupuesto.Models
     {
         public int Id { get; set; }
         public int usuarioId { get; set; }
+        [Display(Name = "Fecha transacción")]
+        [DataType(DataType.Date)]
         public DateTime FechaTransaccion { get; set; } = DateTime.Today;
         public decimal Monto { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Debe seleccionar una categoría")]

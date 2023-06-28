@@ -10,14 +10,17 @@ namespace ManejoPresupuesto.Controllers
         private readonly IServicioUsuarios servicioUsuarios;
         private readonly IrepositorioCuentas repositorioCuentas;
         private readonly IRepositorioCategorias repositorioCategorias;
+        private readonly IRepositorioTransacciones repositorioTransacciones;
 
         public TransaccionesController(IServicioUsuarios servicioUsuarios,
                                        IrepositorioCuentas repositorioCuentas,
-                                       IRepositorioCategorias repositorioCategorias)
+                                       IRepositorioCategorias repositorioCategorias,
+                                       IRepositorioTransacciones repositorioTransacciones)
         {
             this.servicioUsuarios = servicioUsuarios;
             this.repositorioCuentas = repositorioCuentas;
             this.repositorioCategorias = repositorioCategorias;
+            this.repositorioTransacciones = repositorioTransacciones;
         }
         
         public async Task<IActionResult> Crear()
@@ -27,6 +30,36 @@ namespace ManejoPresupuesto.Controllers
             modelo.Cuentas = await ObtenerCuentas(usuarioId);
             modelo.Categorias = await ObtenerCategorias(usuarioId, modelo.TipoOperacionId);
             return View(modelo);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Crear(TransaccionCreacionViewModel modelo)
+        {
+            var usuarioId = servicioUsuarios.ObtenerUsuarioId();
+
+            if (!ModelState.IsValid)
+            {
+                modelo.Cuentas = await ObtenerCuentas(usuarioId);
+                modelo.Categorias = await ObtenerCategorias(usuarioId, modelo.TipoOperacionId);
+                return View(modelo);
+            }
+
+            var cuenta = await repositorioCuentas.ObtenerPorId(modelo.CuentaId, usuarioId);
+
+            if (cuenta == null)
+            {
+                RedirectToAction("NoEncontrado", "Home");
+            }
+
+            modelo.usuarioId = usuarioId;
+
+            if (modelo.TipoOperacionId ==  TipoOperacion.Gasto )
+            {
+                modelo.Monto *= -1;
+            }
+
+            await repositorioTransacciones.Crear(modelo);
+            return RedirectToAction("Index");
         }
 
         private async Task<IEnumerable<SelectListItem>> ObtenerCuentas(int usuarioId)

@@ -57,5 +57,31 @@ namespace ManejoPresupuesto.Controllers
             return RedirectToAction("Index", "Transacciones");
         }
 
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var resultado = await signInManager.PasswordSignInAsync(model.Email, model.PassWord, model.Recuerdame, lockoutOnFailure: false);
+
+            if (resultado.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Usuario o contraseña incorrecto");
+                return View(model);
+            }
+        }
+
     }
 }
